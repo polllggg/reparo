@@ -5,9 +5,20 @@ import base64
 from openai import OpenAI
 from matching import CATALOG, is_compatible, _num
 
+def _get_key():
+    # локально — из переменной окружения; на Streamlit Cloud — из secrets
+    key = os.environ.get("RADEON_API_KEY")
+    if key:
+        return key
+    try:
+        import streamlit as st
+        return st.secrets["RADEON_API_KEY"]
+    except Exception:
+        raise RuntimeError("RADEON_API_KEY not set (env var or Streamlit secrets)")
+
 client = OpenAI(
     base_url="https://developer.amd.com.cn/radeon/api/v1",
-    api_key=os.environ["RADEON_API_KEY"],
+    api_key=_get_key(),
 )
 
 PROMPT = (
